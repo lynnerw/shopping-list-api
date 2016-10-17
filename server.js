@@ -40,11 +40,12 @@ app.post('/items', jsonParser, function(request, response) {
 });
 
 app.delete('/items/:id', jsonParser, function(request, response) {
-//    if (!('id' in request.body)) {
-//        return response.sendStatus(404), response.json('Hmm, I can\'t find that item. Please check the spelling and try again.');
-//return response.json(storage.items);
-//  response.status(200).json(request.body.name + ' has been deleted.');
-
+    if (!('id' in request.body)) {
+      return response.sendStatus(404), response.json('Hmm, I can\'t find that item. Please check the spelling and try again.');
+    }
+    var index = request.body.id-1;
+    storage.items.splice(index, 1);
+    response.status(200).json(request.body.name + ' has been deleted.');
 });
 
 app.listen(process.env.PORT || 8080, process.env.IP);
