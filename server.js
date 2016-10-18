@@ -48,16 +48,15 @@ app.put('/items/:id', jsonParser, function(request, response) {
 
         var id = request.body.id;
         var name = request.body.name;
-console.log('storage items is ' + storage.items);
-            // indexOf returns -1 if item DNE
+
         var arrayIndex = storage.items.indexOf(name, 0);
 
-        //if storage.items[arrayIndex].id != id {
-        //return response.status(400).json(request.body.name + ' could not be updated.');
-        //}
-
-        storage.items.splice(arrayIndex, 1);
-        response.status(200).json(request.body.name + ' has been changed.');
+        if (arrayIndex === -1) {
+        return response.status(400).json('The item could not be updated.');
+        } else {
+            storage.items.splice(arrayIndex, 1, request.body.name);
+            response.status(200).json('The item has been changed.');
+        }
     }
 });
 
