@@ -8,6 +8,36 @@ var Storage = {
     this.items.push(item);
     this.setId += 1;
     return item;
+  },
+  modify: function(name, id) {
+    var arrayIndex = -1;
+    var item = {name: name, id: id};
+    for (var i = 0; i < this.items.length; i++) {
+        if(this.items[i].id === id) {
+            arrayIndex = i;
+            break;
+        }
+    }
+    if (arrayIndex == -1)
+        return false;
+    this.items[arrayIndex] = item;
+    return true;
+  },
+  delete: function(id) {
+    var arrayIndex = -1;
+    for (var i = 0; i < this.items.length; i++) {
+        console.log(this.items[i].id + ' ' + this.items[i].name);
+        if(this.items[i].id == id) {
+            arrayIndex = i;
+            break;
+        }
+    }
+    if (arrayIndex == -1) {
+        return false;
+    } else {
+        this.items.splice(arrayIndex, 1);
+        return true;
+    }
   }
 };
 
@@ -40,53 +70,31 @@ app.post('/items', jsonParser, function(request, response) {
 });
 
 app.put('/items/:id', jsonParser, function(request, response) {
-
     if (!('id' in request.body) && !('name' in request.body)) {
-        return response.status(400).json(request.params.name + ' could not be updated.');
-
+        return response.status(400).json(request.params.id + ' could not be updated.');
     } else {
-
         var id = request.body.id;
         var name = request.body.name;
-
-        var arrayIndex = storage.items.indexOf(name, 0);
-
-        if (arrayIndex === -1) {
-        return response.status(400).json('The item could not be updated.');
+        var success = storage.modify(name, id);
+        if (success) {
+            return response.status(200).json({status: 'OK'});
         } else {
-            storage.items.splice(arrayIndex, 1, request.body.name);
-            response.status(200).json('The item has been changed.');
+            return response.status(400).json({status: 'not OK'});
         }
     }
 });
 
 app.delete('/items/:id', jsonParser, function(request, response) {
-    var id = request.params.id;
     if (!('id' in request.params)) {
         return response.sendStatus(404), response.json('Hmm, I can\'t find that item. Please check the spelling and try again.');
     }
-    var index = id-1;
-    storage.items.splice(index, 1);
-
-    response.status(200).json(request.body.name + ' has been deleted.');
-});
-
-
-
-
-
-
-
-
-
-app.delete('/items/:id', function(request, response) {
     var id = request.params.id;
-    if (!('id' in request.params)) {
-        return response.sendStatus(404), response.json('Hmm, I can\'t find that item. Please check the spelling and try again.');
+    var success = storage.delete(id);
+    if (success) {
+        return response.status(200).json({status: 'OK'});
+    } else {
+        return response.status(400).json({status: 'not OK'});
     }
-    var index = id-1;
-    storage.items.splice(index, 1);
-    response.status(200).json(request.params.name + ' has been deleted.');
 });
 
 app.listen(process.env.PORT || 8080, process.env.IP);
