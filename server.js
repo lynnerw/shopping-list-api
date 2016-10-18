@@ -39,6 +39,47 @@ app.post('/items', jsonParser, function(request, response) {
     response.status(201).json(item);
 });
 
+app.put('/items/:id', jsonParser, function(request, response) {
+
+    if (!('id' in request.body) && !('name' in request.body)) {
+        return response.status(400).json(request.params.name + ' could not be updated.');
+
+    } else {
+
+        var id = request.body.id;
+        var name = request.body.name;
+console.log('storage items is ' + storage.items);
+            // indexOf returns -1 if item DNE
+        var arrayIndex = storage.items.indexOf(name, 0);
+
+        //if storage.items[arrayIndex].id != id {
+        //return response.status(400).json(request.body.name + ' could not be updated.');
+        //}
+
+        storage.items.splice(arrayIndex, 1);
+        response.status(200).json(request.body.name + ' has been changed.');
+    }
+});
+
+app.delete('/items/:id', jsonParser, function(request, response) {
+    var id = request.params.id;
+    if (!('id' in request.params)) {
+        return response.sendStatus(404), response.json('Hmm, I can\'t find that item. Please check the spelling and try again.');
+    }
+    var index = id-1;
+    storage.items.splice(index, 1);
+
+    response.status(200).json(request.body.name + ' has been deleted.');
+});
+
+
+
+
+
+
+
+
+
 app.delete('/items/:id', function(request, response) {
     var id = request.params.id;
     if (!('id' in request.params)) {
